@@ -101,7 +101,7 @@ class WikiPage:
             return False
         uid = pn[0]
         link_text = PAGE_REF_FORMAT_UID % uid
-        print("link text:%s" % link_text)
+        print("link text (uid):%s" % link_text)
         try:
             if link_text in open(filename).read():
                 return True
