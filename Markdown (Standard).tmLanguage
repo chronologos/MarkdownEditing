@@ -1171,7 +1171,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>(\[\[)([A-za-z0-9.]+)(\]\])</string>
+			<string>(\[\[)([A-za-z0-9.\-\_\s]+)(\]\])</string>
 			<key>name</key>
 			<string>meta.link.wiki.markdown</string>
 		</dict>
