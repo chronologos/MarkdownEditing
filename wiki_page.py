@@ -67,6 +67,7 @@ class WikiPage:
         self.current_file = self.view.file_name()
         self.current_dir, current_base = os.path.split(self.current_file)
         self.current_name, _ = os.path.splitext(current_base)
+        print(self.current_name)
 
         markdown_extension = self.view.settings().get("mde.wikilinks.markdown_extension", DEFAULT_MARKDOWN_EXTENSION)
 
@@ -83,7 +84,7 @@ class WikiPage:
 
     def contains_ref(self, filename, page_name):
         link_text = PAGE_REF_FORMAT % page_name
-
+        print("link text:%s" % link_test)
         try:
             if link_text in open(filename).read():
                 return True
