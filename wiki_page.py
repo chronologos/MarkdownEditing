@@ -84,7 +84,7 @@ class WikiPage:
 
     def contains_ref(self, filename, page_name):
         link_text = PAGE_REF_FORMAT % page_name
-        print("link text:%s" % link_test)
+        print("link text:%s" % link_text)
         try:
             if link_text in open(filename).read():
                 return True
