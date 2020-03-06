@@ -5,6 +5,7 @@ import re
 
 DEFAULT_MARKDOWN_EXTENSION = '.md'
 PAGE_REF_FORMAT = '[[%s]]'
+PAGE_REF_FORMAT_UID = '[[%s'
 DEFAULT_HOME_PAGE = "HomePage"
 
 
@@ -76,7 +77,7 @@ class WikiPage:
             for file in files:
                 page_name, extension = os.path.splitext(file)
                 filename = os.path.join(dirname, file)
-                if extension == markdown_extension and self.contains_ref(filename, self.current_name):
+                if extension == markdown_extension and self.contains_ref_uid(filename, self.current_name):
                     results.append([page_name, filename])
 
         return results
@@ -84,6 +85,22 @@ class WikiPage:
 
     def contains_ref(self, filename, page_name):
         link_text = PAGE_REF_FORMAT % page_name
+        print("link text:%s" % link_text)
+        try:
+            if link_text in open(filename).read():
+                return True
+        except:
+            pass
+
+        return False
+
+
+    def contains_ref_uid(self, filename, page_name):
+        pn = page_name.split("_")
+        if len(pn) == 0:
+            return False
+        uid = pn[0]
+        link_text = PAGE_REF_FORMAT_UID % uid
         print("link text:%s" % link_text)
         try:
             if link_text in open(filename).read():
