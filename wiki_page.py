@@ -29,7 +29,7 @@ class WikiPage:
         print("Open page: %s" % (pagename))
 
         if pagename:
-            self.file_list = self.find_files_with_name(pagename)
+            self.file_list = self.find_files_with_name_ref(pagename)
 
         if len(self.file_list) > 1:
             self.view.window().show_quick_panel(self.file_list, self.open_selected_file)
@@ -42,6 +42,32 @@ class WikiPage:
     def find_files_with_name(self, pagename):
         pagename = pagename.replace('\\', os.sep).replace(os.sep+os.sep, os.sep).strip()
 
+        self.current_file = self.view.file_name()
+        self.current_dir = os.path.dirname(self.current_file)
+        print("Locating page '%s' in: %s" % (pagename, self.current_dir) )
+
+        markdown_extension = self.view.settings().get("mde.wikilinks.markdown_extension", DEFAULT_MARKDOWN_EXTENSION)
+
+        # Optionally strip extension...
+        if pagename.endswith(markdown_extension):
+            search_pattern = "^%s$" % pagename
+        else:
+            search_pattern = "^%s%s$" % (pagename, markdown_extension)
+
+        # Scan directory tree for files that match the pagename...
+        results = []
+        for dirname, _, files in self.list_dir_tree(self.current_dir):
+            for file in files:
+                if re.search(search_pattern, file):
+                    filename = os.path.join(dirname, file)
+                    results.append([self.extract_page_name(filename), filename])
+
+        return results
+
+    # Support jumping to wiki links with format [[20200308120540_something.md]].
+    def find_files_with_name_ref(self, pagename):
+        pagename = pagename.replace('\\', os.sep).replace(os.sep+os.sep, os.sep).strip()
+        pagename = pagename.split("_")[0]
         self.current_file = self.view.file_name()
         self.current_dir = os.path.dirname(self.current_file)
         print("Locating page '%s' in: %s" % (pagename, self.current_dir) )
@@ -85,7 +111,6 @@ class WikiPage:
 
     def contains_ref(self, filename, page_name):
         link_text = PAGE_REF_FORMAT % page_name
-        print("link text:%s" % link_text)
         try:
             if link_text in open(filename).read():
                 return True
