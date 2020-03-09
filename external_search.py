@@ -17,7 +17,9 @@ class ExternalSearch:
         Perform an external search for regexp in folder.
         """
         print("in rg_search_in")
-        args = [ExternalSearch.SEARCH_COMMAND]
+        search_command = self.view.settings().get("mde.ag_location", SEARCH_COMMAND)
+        print("using rg {}".format(search_command))
+        args = [search_command]
         args.extend(['-l', regexp, folder])
         print('args={}'.format(args))
         return ExternalSearch.run(args, folder)
