@@ -138,7 +138,7 @@ def plugin_loaded():
             # Prmopts to select a color theme
             choose_color_theme()
     print("setting external search cmd {}".format(ExternalSearch.SEARCH_COMMAND))
-    ExternalSearch.SEARCH_COMMAND = sublime.load_settings('Markdown.sublime-settings').get("mde.rg_location", ExternalSearch.SEARCH_COMMAND)
+    ExternalSearch.SEARCH_COMMAND = sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", ExternalSearch.SEARCH_COMMAND)
     print("set external search cmd {}".format(ExternalSearch.SEARCH_COMMAND))
 
 def plugin_unloaded():
