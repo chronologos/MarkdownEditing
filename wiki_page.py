@@ -57,7 +57,8 @@ class WikiPage:
         name_ref = basename.split("_")[0]
 
         results = []
-        res = ExternalSearch.rg_search_in(self.current_dir, name_ref)
+        search = ExternalSearch(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
+        res = search.rg_search_in(self.current_dir, name_ref)
         file_paths = res.split("\n")
         for file_path_ext in file_paths:
             if not file_path_ext: continue
@@ -79,7 +80,8 @@ class WikiPage:
 
         # Scan directory tree for file names that match the name_ref...
         results = []
-        res = ExternalSearch.rg_search_for_file(self.current_dir, "*{}*".format(name_ref))
+        search = ExternalSearch(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
+        res = search.rg_search_for_file(self.current_dir, "*{}*".format(name_ref))
         file_paths = res.split("\n")
         for file_path_ext in file_paths:
             if not file_path_ext: continue
@@ -185,8 +187,9 @@ class WikiPage:
             word = word[:-len(markdown_extension)]
 
         # Scan directory tree for potential filenames that contain the word...
+        search = ExternalSearch(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
         results = []
-        res = ExternalSearch.rg_search_in(current_dir, word, ".md", False)
+        res = search.rg_search_in(current_dir, word, ".md", False)
         print('res={}'.format(res))
         for dirname, _, files in self.list_dir_tree(current_dir):
             for file in files:

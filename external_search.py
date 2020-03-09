@@ -11,39 +11,36 @@ class ExternalSearch:
     """
     # EXTERNALIZE = '.search_results.zkr'   # '' to skip
 
-
-    @staticmethod
-    def set_search_cmd(s):
-        print("set_search_cmd {}".format(s))
-        MDE_SEARCH_COMMAND = s
+    def __init__(self, search_cmd):
+        self.search_cmd=search_cmd
 
 
     @staticmethod
-    def rg_search_in(folder, regexp):
+    def rg_search_in(self, folder, regexp):
         """
         Perform an external search for regexp in folder.
         """
         print("in rg_search_in")
-        args = [MDE_SEARCH_COMMAND]
+        args = [self.search_cmd]
         args.extend(['-l', regexp, folder])
         print('args={}'.format(args))
         return ExternalSearch.run(args, folder)
 
 
     @staticmethod
-    def rg_search_for_file(folder, glob):
+    def rg_search_for_file(self, folder, glob):
         """   
         Perform an external search for files matching glob in folder.
         """
         print("in rg_search_for_file")
-        args = [MDE_SEARCH_COMMAND]
+        args = [self.search_cmd]
         args.extend(['-g', glob, '--files', folder])
         print('args={}'.format(args))
-        return ExternalSearch.run(args, folder)
+        return self.run(args, folder)
 
 
     @staticmethod
-    def run(args, folder):
+    def run(self, args, folder):
         """
         Execute SEARCH_COMMAND to run a search, handle errors & timeouts.
         Return output of stdout as string.

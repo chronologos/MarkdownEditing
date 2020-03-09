@@ -4,7 +4,6 @@ import sublime_plugin
 import re
 try:
     from MarkdownEditing.mdeutils import *
-    from MarkdownEditing.external_search import *   
 except ImportError:
     from mdeutils import *
 
@@ -129,7 +128,6 @@ This [[SamplePage]] is a wiki link
 
 
 def plugin_loaded():
-    global MDE_SEARCH_COMMAND
     if "package_control" in sys.modules:
         from package_control import events
 
@@ -138,9 +136,7 @@ def plugin_loaded():
             disable_native_markdown_package()
             # Prmopts to select a color theme
             choose_color_theme()
-    print("setting external search cmd {}".format(MDE_SEARCH_COMMAND))
-    ExternalSearch.set_search_cmd(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
-    print("set external search cmd {}".format(MDE_SEARCH_COMMAND))
+
 
 def plugin_unloaded():
     if "package_control" in sys.modules:
