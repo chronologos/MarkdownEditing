@@ -24,7 +24,7 @@ class ExternalSearch:
         args = [self.search_cmd]
         args.extend(['-l', regexp, folder])
         print('args={}'.format(args))
-        return ExternalSearch.run(args, folder)
+        return self.run(args, folder)
 
 
     @staticmethod
@@ -62,23 +62,3 @@ class ExternalSearch:
         if verbose:
             print(output.decode('utf-8', errors='ignore'))
         return output.decode('utf-8', errors='ignore').replace('\r', '')
-
-
-    @staticmethod
-    def search_all_tags(folder, extension):
-        """
-        Create a list of all #tags of all notes in folder.
-        """
-        output = ExternalSearch.search_in(folder, ZkConstants.RE_TAGS(),
-                                          extension, tags=True)
-        tags = set()
-        for line in output.split('\n'):
-            if line:
-                tags.add(line)
-        if ExternalSearch.EXTERNALIZE:
-            with open(ExternalSearch.external_file(folder), mode='w',
-                      encoding='utf-8') as f:
-                f.write('# All Tags\n\n')
-                for tag in sorted(tags):
-                    f.write(u'* {}\n'.format(tag))
-        return list(tags)

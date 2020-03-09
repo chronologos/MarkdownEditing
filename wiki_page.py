@@ -189,7 +189,7 @@ class WikiPage:
         # Scan directory tree for potential filenames that contain the word...
         search = ExternalSearch(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
         results = []
-        res = search.rg_search_in(current_dir, word, ".md", False)
+        res = search.rg_search_in(current_dir, word)
         print('res={}'.format(res))
         for dirname, _, files in self.list_dir_tree(current_dir):
             for file in files:
