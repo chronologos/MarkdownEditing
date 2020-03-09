@@ -3,11 +3,12 @@ import os, string
 import re
 import subprocess
 
+MDE_SEARCH_COMMAND = '/usr/local/bin/rg'
+
 class ExternalSearch:
     """
     Static class to group all external search related functions.
     """
-    SEARCH_COMMAND = '/usr/local/bin/rg'
     # EXTERNALIZE = '.search_results.zkr'   # '' to skip
 
 
@@ -17,7 +18,7 @@ class ExternalSearch:
         Perform an external search for regexp in folder.
         """
         print("in rg_search_in")
-        args = [ExternalSearch.SEARCH_COMMAND]
+        args = [MDE_SEARCH_COMMAND]
         args.extend(['-l', regexp, folder])
         print('args={}'.format(args))
         return ExternalSearch.run(args, folder)
@@ -29,7 +30,7 @@ class ExternalSearch:
         Perform an external search for files matching glob in folder.
         """
         print("in rg_search_for_file")
-        args = [ExternalSearch.SEARCH_COMMAND]
+        args = [MDE_SEARCH_COMMAND]
         args.extend(['-g', glob, '--files', folder])
         print('args={}'.format(args))
         return ExternalSearch.run(args, folder)
