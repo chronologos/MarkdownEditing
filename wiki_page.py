@@ -81,6 +81,7 @@ class WikiPage:
         # Scan directory tree for file names that match the name_ref...
         results = []
         search = ExternalSearch(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
+        print(sublime.load_settings('Markdown (Standard).sublime-settings').get("mde.rg_location", MDE_SEARCH_COMMAND))
         res = search.rg_search_for_file(self.current_dir, "*{}*".format(name_ref))
         file_paths = res.split("\n")
         for file_path_ext in file_paths:

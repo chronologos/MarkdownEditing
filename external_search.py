@@ -15,19 +15,18 @@ class ExternalSearch:
         self.search_cmd=search_cmd
 
 
-    @staticmethod
     def rg_search_in(self, folder, regexp):
         """
         Perform an external search for regexp in folder.
         """
         print("in rg_search_in")
+        print(self.search_cmd)
         args = [self.search_cmd]
         args.extend(['-l', regexp, folder])
         print('args={}'.format(args))
         return self.run(args, folder)
 
 
-    @staticmethod
     def rg_search_for_file(self, folder, glob):
         """   
         Perform an external search for files matching glob in folder.
@@ -39,7 +38,6 @@ class ExternalSearch:
         return self.run(args, folder)
 
 
-    @staticmethod
     def run(self, args, folder):
         """
         Execute SEARCH_COMMAND to run a search, handle errors & timeouts.
