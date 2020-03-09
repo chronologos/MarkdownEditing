@@ -136,7 +136,9 @@ def plugin_loaded():
             disable_native_markdown_package()
             # Prmopts to select a color theme
             choose_color_theme()
-
+    print("setting external search cmd {}".format(ExternalSearch.SEARCH_COMMAND))
+    ExternalSearch.SEARCH_COMMAND = sublime.load_settings('Markdown.sublime-settings').get("mde.rg_location", ExternalSearch.SEARCH_COMMAND)
+    print("set external search cmd {}".format(ExternalSearch.SEARCH_COMMAND))
 
 def plugin_unloaded():
     if "package_control" in sys.modules:
