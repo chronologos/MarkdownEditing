@@ -13,6 +13,12 @@ class ExternalSearch:
 
 
     @staticmethod
+    def set_search_cmd(s):
+        print("set_search_cmd {}".format(s))
+        MDE_SEARCH_COMMAND = s
+
+
+    @staticmethod
     def rg_search_in(folder, regexp):
         """
         Perform an external search for regexp in folder.
