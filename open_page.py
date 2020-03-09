@@ -26,21 +26,12 @@ class OpenPageCommand(MDETextCommand):
         return False
 
     def run(self, edit):
-        print("Running OpenPageCommand")        
+        print("Running OpenPageCommand")     
         wiki_page = WikiPage(self.view)
-
-        sel_region = self.get_selected()
-        if sel_region:
-            wiki_page.select_word_at_cursor()
-
-            region = sublime.Region(sel_region.begin(), sel_region.begin())
-            file_list = wiki_page.find_matching_files(region)
-
-            if len(file_list) > 1:
-                wiki_page.show_quick_list(file_list)
-        else:
-            name = wiki_page.identify_page_at_cursor()
-            wiki_page.select_page(name)
+        pagename = wiki_page.identify_page_at_cursor()
+        # Try to extract ref, if not it defaults to pagename.
+        pageref = wiki_page.extract_ref(pagename)
+        wiki_page.select_page(pageref)
 
 
     def get_selected(self):

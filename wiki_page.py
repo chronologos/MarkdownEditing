@@ -8,6 +8,10 @@ PAGE_REF_FORMAT = '[[%s]]'
 PAGE_REF_FORMAT_UID = '[[%s'
 DEFAULT_HOME_PAGE = "HomePage"
 
+try:
+    from MarkdownEditing.external_search import *
+except ImportError:
+    from wiki_page import *
 
 class WikiPage:
     def __init__(self, view):
@@ -21,15 +25,22 @@ class WikiPage:
             scope_region = self.view.extract_scope(pos)
             if not scope_region.empty():
                 text_on_cursor = self.view.substr(scope_region)
+                print("page = {}".format(text_on_cursor))
                 return text_on_cursor.strip(string.punctuation)
 
         return None
+
+    def extract_ref(self, pagename):
+        ref = pagename.split("_")[0]
+        if not ref:
+            return pagename
+        return ref
 
     def select_page(self, pagename):
         print("Open page: %s" % (pagename))
 
         if pagename:
-            self.file_list = self.find_files_with_name_ref(pagename)
+            self.file_list = self.find_filenames_with_name_ref(pagename)
 
         if len(self.file_list) > 1:
             self.view.window().show_quick_panel(self.file_list, self.open_selected_file)
@@ -39,101 +50,46 @@ class WikiPage:
             self.open_new_file(pagename)
 
 
-    def find_files_with_name(self, pagename):
-        pagename = pagename.replace('\\', os.sep).replace(os.sep+os.sep, os.sep).strip()
-
+    def find_backlinks(self):
         self.current_file = self.view.file_name()
         self.current_dir = os.path.dirname(self.current_file)
-        print("Locating page '%s' in: %s" % (pagename, self.current_dir) )
+        basename = os.path.basename(self.current_file)
+        name_ref = basename.split("_")[0]
 
-        markdown_extension = self.view.settings().get("mde.wikilinks.markdown_extension", DEFAULT_MARKDOWN_EXTENSION)
-
-        # Optionally strip extension...
-        if pagename.endswith(markdown_extension):
-            search_pattern = "^%s$" % pagename
-        else:
-            search_pattern = "^%s%s$" % (pagename, markdown_extension)
-
-        # Scan directory tree for files that match the pagename...
         results = []
-        for dirname, _, files in self.list_dir_tree(self.current_dir):
-            for file in files:
-                if re.search(search_pattern, file):
-                    filename = os.path.join(dirname, file)
-                    results.append([self.extract_page_name(filename), filename])
+        res = ExternalSearch.rg_search_in(self.current_dir, name_ref)
+        file_paths = res.split("\n")
+        for file_path_ext in file_paths:
+            if not file_path_ext: continue
+            print("fpe:{}.".format(file_path_ext))
+            file_path, extension = os.path.splitext(file_path_ext)
+            dirname = os.path.dirname(file_path)
+            basename = os.path.basename(file_path)
+            results.append([basename, file_path_ext])
 
         return results
 
-    # Support jumping to wiki links with format [[20200308120540_something.md]].
-    def find_files_with_name_ref(self, pagename):
-        pagename = pagename.replace('\\', os.sep).replace(os.sep+os.sep, os.sep).strip()
-        pagename = pagename.split("_")[0]
+    # Support jumping to wiki links based on ref.
+    def find_filenames_with_name_ref(self, name_ref):
+        name_ref = name_ref.replace('\\', os.sep).replace(os.sep+os.sep, os.sep).strip()
+        name_ref = name_ref.split("_")[0]
         self.current_file = self.view.file_name()
         self.current_dir = os.path.dirname(self.current_file)
-        print("Locating page '%s' in: %s" % (pagename, self.current_dir) )
+        print("Locating name_ref '%s' in: %s" % (name_ref, self.current_dir))
 
-        markdown_extension = self.view.settings().get("mde.wikilinks.markdown_extension", DEFAULT_MARKDOWN_EXTENSION)
-
-        # Optionally strip extension...
-        if pagename.endswith(markdown_extension):
-            search_pattern = "^%s$" % pagename
-        else:
-            search_pattern = "^%s%s$" % (pagename, markdown_extension)
-
-        # Scan directory tree for files that match the pagename...
+        # Scan directory tree for file names that match the name_ref...
         results = []
-        for dirname, _, files in self.list_dir_tree(self.current_dir):
-            for file in files:
-                if re.search(search_pattern, file):
-                    filename = os.path.join(dirname, file)
-                    results.append([self.extract_page_name(filename), filename])
+        res = ExternalSearch.rg_search_for_file(self.current_dir, "*{}*".format(name_ref))
+        file_paths = res.split("\n")
+        for file_path_ext in file_paths:
+            if not file_path_ext: continue
+            print("fpe:{}.".format(file_path_ext))
+            file_path, extension = os.path.splitext(file_path_ext)
+            dirname = os.path.dirname(file_path)
+            basename = os.path.basename(file_path)
+            results.append([basename, file_path_ext])
 
         return results
-
-    def find_files_with_ref(self):
-        self.current_file = self.view.file_name()
-        self.current_dir, current_base = os.path.split(self.current_file)
-        self.current_name, _ = os.path.splitext(current_base)
-        print(self.current_name)
-
-        markdown_extension = self.view.settings().get("mde.wikilinks.markdown_extension", DEFAULT_MARKDOWN_EXTENSION)
-
-        results = []
-        for dirname, _, files in self.list_dir_tree(self.current_dir):
-            for file in files:
-                page_name, extension = os.path.splitext(file)
-                filename = os.path.join(dirname, file)
-                if extension == markdown_extension and self.contains_ref_uid(filename, self.current_name):
-                    results.append([page_name, filename])
-
-        return results
-
-
-    def contains_ref(self, filename, page_name):
-        link_text = PAGE_REF_FORMAT % page_name
-        try:
-            if link_text in open(filename).read():
-                return True
-        except:
-            pass
-
-        return False
-
-
-    def contains_ref_uid(self, filename, page_name):
-        pn = page_name.split("_")
-        if len(pn) == 0:
-            return False
-        uid = pn[0]
-        link_text = PAGE_REF_FORMAT_UID % uid
-        print("link text (uid):%s" % link_text)
-        try:
-            if link_text in open(filename).read():
-                return True
-        except:
-            pass
-
-        return False
 
 
     def select_backlink(self, file_list):
@@ -230,6 +186,8 @@ class WikiPage:
 
         # Scan directory tree for potential filenames that contain the word...
         results = []
+        res = ExternalSearch.rg_search_in(current_dir, word, ".md", False)
+        print('res={}'.format(res))
         for dirname, _, files in self.list_dir_tree(current_dir):
             for file in files:
                 page_name, extension = os.path.splitext(file)

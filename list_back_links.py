@@ -17,6 +17,6 @@ class ListBackLinksCommand(MDETextCommand):
         print("Running ListBackLinksCommand")        
         wiki_page = WikiPage(self.view)
 
-        file_list = wiki_page.find_files_with_ref()
+        file_list = wiki_page.find_backlinks()
         wiki_page.select_backlink(file_list)
 
